@@ -1,0 +1,38 @@
+#!/bin/sh
+# How To Use
+# $./[This File Name] [Perl File ] [dump File] [Number of files] [Directory Name]
+# * : Optional Argument
+
+echo "Perl File		:${perlfile}"
+echo "dump file		:${dumpfile}"
+echo "Number of files	:${number_of_files}"
+echo "Directory Name	:${directory_name}"
+echo "------------------------------------------"
+
+mkdir ${directory_name}
+
+# Repeat execution
+loop=0
+while [ $loop -ne $number_of_files ]
+do
+	# UNIX Find the time
+	BTunix=`date "+%s"`
+	
+	loop=`expr $loop + 1`
+	echo "${loop} 回目"
+
+	perl ${perlfile} ${dumpfile} > ${loop}.log
+	
+	cp ${loop}.log ./${directory_name}
+	
+	#Estimate the time taken for one loop and predict the end time (rough)
+	NTunix=`date "+%s"`
+	NTunix=$(( NTunix - BTunix ))
+	NTunix=`expr \( $number_of_files - $loop \) \* $NTunix`
+	NTunix=$(( BTunix + NTunix ))
+	if [ $loop -ne $number_of_files ]
+	then
+	echo "Expected end time： `echo $NTunix | awk '{print strftime("%c", $1); }'`" 
+	fi
+done
+
